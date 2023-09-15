@@ -1,11 +1,11 @@
-package com.ethlo.lapstats;
-
-import com.ethlo.lapstats.model.RaceData;
+package com.ethlo.lapstats.render;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Writer;
 
-public interface StatusRenderer {
+import com.ethlo.lapstats.model.RaceData;
+
+public interface StatusRenderer
+{
     void render(RaceData raceData, OutputStream out) throws IOException;
 }
