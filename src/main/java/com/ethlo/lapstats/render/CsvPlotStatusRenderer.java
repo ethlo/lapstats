@@ -6,10 +6,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Comparator;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import com.ethlo.lapstats.model.ExtendedLapData;
+import com.ethlo.lapstats.model.Driver;
 import com.ethlo.lapstats.model.RaceData;
 
 public class CsvPlotStatusRenderer implements StatusRenderer
@@ -19,24 +19,26 @@ public class CsvPlotStatusRenderer implements StatusRenderer
     {
         try (final PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8)))
         {
-            for (Duration timestamp : raceData.getTicks())
+            pw.print("Lap,");
+            pw.print(raceData.getDrivers().stream().map(Driver::name).collect(Collectors.joining(",")));
+            pw.println();
+
+            raceData.getLaps().forEach((lap, lapData) ->
             {
-                final ExtendedLapData data = raceData.getLapData(timestamp);
-                final List<ExtendedLapData> forSameLap = raceData.getLap(data.lap().lap());
-                forSameLap.sort(Comparator.comparing(ExtendedLapData::accumulatedLapTime));
-                pw.print(data.accumulatedLapTime());
-                pw.print(",");
-                final ExtendedLapData firstPos = forSameLap.get(0);
-                final Duration diffToCurrent = firstPos.accumulatedLapTime().minus(timestamp).abs();
-                for (int pos = 0; pos < forSameLap.size(); pos++)
-                {
-                    final ExtendedLapData l = forSameLap.get(pos);
-                    final String driverName = raceData.getDriverData(l.lap().driverId()).name();
-                    final Duration diffFromLeader = l.accumulatedLapTime().minus(data.accumulatedLapTime()).plus(diffToCurrent);
-                    pw.print(pos + "," + driverName + "," + diffFromLeader.toMillis());
-                }
+                pw.print(lapData.get(0).lap().lap() + ",");
+                pw.print(lapData.stream().map(l -> formatTimestamp(l.accumulatedLapTime())).collect(Collectors.joining(",")));
                 pw.println();
-            }
+            });
         }
+    }
+
+    public static String formatTimestamp(final Duration duration)
+    {
+        final long interval = duration.toMillis();
+        final long hour = TimeUnit.MILLISECONDS.toHours(interval) % 60;
+        final long min = TimeUnit.MILLISECONDS.toMinutes(interval) % 60;
+        final long sec = TimeUnit.MILLISECONDS.toSeconds(interval) % 60;
+        final long ms = TimeUnit.MILLISECONDS.toMillis(interval) % 1000;
+        return String.format("%02d:%02d:%02d.%03d", hour, min, sec, ms);
     }
 }

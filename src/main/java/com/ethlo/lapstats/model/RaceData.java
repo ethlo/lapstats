@@ -101,4 +101,9 @@ public class RaceData
     {
         return driverData.values();
     }
+
+    public Map<Integer, List<ExtendedLapData>> getLaps()
+    {
+        return lapToDriverLapList;
+    }
 }
