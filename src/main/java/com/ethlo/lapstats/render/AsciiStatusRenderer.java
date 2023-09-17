@@ -22,7 +22,7 @@ public class AsciiStatusRenderer implements StatusRenderer
             final int maxDriverNameLength = raceData.getDrivers().stream().max(Comparator.comparingInt(a -> a.name().length())).orElseThrow().name().length();
             for (Duration timestamp : raceData.getTicks())
             {
-                final ExtendedLapData data = raceData.getLapData(timestamp);
+                final ExtendedLapData data = raceData.getLap(timestamp);
                 final List<ExtendedLapData> forSameLap = raceData.getLap(data.lap().lap());
                 forSameLap.sort(Comparator.comparing(ExtendedLapData::accumulatedLapTime));
                 pw.println("\n" + formatDiff(data.accumulatedLapTime()));

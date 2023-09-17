@@ -77,7 +77,7 @@ public class RaceData
         return result;
     }
 
-    public ExtendedLapData getLapData(Duration timestamp)
+    public ExtendedLapData getLap(Duration timestamp)
     {
         return ticks.get(timestamp);
     }
