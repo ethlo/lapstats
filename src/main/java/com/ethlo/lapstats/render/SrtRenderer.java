@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ethlo.lapstats.model.Driver;
-import com.ethlo.lapstats.model.ExtendedLapData;
+import com.ethlo.lapstats.model.LapStatistics;
 import com.ethlo.lapstats.model.RaceData;
 
 public class SrtRenderer implements StatusRenderer
@@ -40,17 +40,16 @@ public class SrtRenderer implements StatusRenderer
         {
             raceData.getTicks().forEach(time ->
             {
-                final ExtendedLapData lapData = raceData.getLap(time);
-                final Driver driver = raceData.getDriverData(lapData.lap().driverId());
+                final LapStatistics lapData = raceData.getLap(time);
+                final Driver driver = raceData.getDriverData(lapData.timing().driverId());
                 out.println(index.getAndIncrement());
                 out.print(formatSrtTimestamp(time));
                 out.print(" --> ");
                 out.print(formatSrtTimestamp(time.plus(ttl)));
                 out.println();
                 out.print(driver.name());
-                //out.print(" | Position " + lapData.position());
-                out.print(" | Lap " + lapData.lap().lap());
-                out.print(" | Time " + formatIntervalWithSeconds(lapData.lap().time(), false)); // + " (" + (lapData.diffLastLap() != null ? formatIntervalWithSeconds(lapData.diffLastLap(), true) : " - ") + ")");
+                out.print(" | Lap " + lapData.timing().lap());
+                out.print(" | Time " + formatIntervalWithSeconds(lapData.timing().time(), false)); // + " (" + (lapData.diffLastLap() != null ? formatIntervalWithSeconds(lapData.diffLastLap(), true) : " - ") + ")");
                 out.println();
                 out.println();
             });

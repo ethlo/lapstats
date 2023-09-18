@@ -2,7 +2,7 @@ package com.ethlo.lapstats.model;
 
 import java.time.Duration;
 
-public record LapData(int lap, int driverId, Duration time)
+public record Timing(int lap, int driverId, Duration time)
 {
 
 }

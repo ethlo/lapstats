@@ -22,7 +22,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.ethlo.lapstats.model.Driver;
-import com.ethlo.lapstats.model.LapData;
+import com.ethlo.lapstats.model.Timing;
 import com.ethlo.lapstats.source.StatsReader;
 
 public class MyRcmReader implements StatsReader
@@ -51,7 +51,7 @@ public class MyRcmReader implements StatsReader
     }
 
     @Override
-    public Map<Integer, List<LapData>> getDriverLapTimes()
+    public Map<Integer, List<Timing>> getDriverLapTimes()
     {
         final Elements tables = doc.select("table");
         return extractLapTimes(tables.subList(1, tables.size() - 1));
@@ -76,16 +76,16 @@ public class MyRcmReader implements StatsReader
         return result;
     }
 
-    private Map<Integer, List<LapData>> extractLapTimes(List<Element> tables)
+    private Map<Integer, List<Timing>> extractLapTimes(List<Element> tables)
     {
         final Collection<List<String>> rows = extractRows(tables, 1);
-        final Map<Integer, List<LapData>> lapToDriverLapList = new HashMap<>();
+        final Map<Integer, List<Timing>> lapToDriverLapList = new HashMap<>();
 
         for (List<String> row : rows)
         {
             final int lap = Integer.parseInt(row.get(0));
 
-            final List<LapData> driverList = new ArrayList<>(row.size());
+            final List<Timing> driverList = new ArrayList<>(row.size());
             for (int driverIndex = 1; driverIndex < row.size(); driverIndex++)
             {
                 final String placementAndTime = row.get(driverIndex);
@@ -94,7 +94,7 @@ public class MyRcmReader implements StatsReader
                 {
                     final MatchResult result = matcher.toMatchResult();
                     final Duration lapTime = getLapDuration(result.group(2));
-                    driverList.add(new LapData(lap, driverIndex, lapTime));
+                    driverList.add(new Timing(lap, driverIndex, lapTime));
                 }
 
                 lapToDriverLapList.put(lap, driverList);

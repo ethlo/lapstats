@@ -8,7 +8,7 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 
-import com.ethlo.lapstats.model.ExtendedLapData;
+import com.ethlo.lapstats.model.LapStatistics;
 import com.ethlo.lapstats.model.RaceData;
 import com.google.common.base.Strings;
 
@@ -22,16 +22,16 @@ public class AsciiStatusRenderer implements StatusRenderer
             final int maxDriverNameLength = raceData.getDrivers().stream().max(Comparator.comparingInt(a -> a.name().length())).orElseThrow().name().length();
             for (Duration timestamp : raceData.getTicks())
             {
-                final ExtendedLapData data = raceData.getLap(timestamp);
-                final List<ExtendedLapData> forSameLap = raceData.getLap(data.lap().lap());
-                forSameLap.sort(Comparator.comparing(ExtendedLapData::accumulatedLapTime));
+                final LapStatistics data = raceData.getLap(timestamp);
+                final List<LapStatistics> forSameLap = raceData.getLap(data.timing().lap());
+                forSameLap.sort(Comparator.comparing(LapStatistics::accumulatedLapTime));
                 pw.println("\n" + formatDiff(data.accumulatedLapTime()));
-                final ExtendedLapData firstPos = forSameLap.get(0);
+                final LapStatistics firstPos = forSameLap.get(0);
                 final Duration diffToCurrent = firstPos.accumulatedLapTime().minus(timestamp).abs();
                 for (int pos = 0; pos < forSameLap.size(); pos++)
                 {
-                    final ExtendedLapData l = forSameLap.get(pos);
-                    final String driverName = raceData.getDriverData(l.lap().driverId()).name();
+                    final LapStatistics l = forSameLap.get(pos);
+                    final String driverName = raceData.getDriverData(l.timing().driverId()).name();
                     final String paddedPos = Strings.padStart(Integer.toString(pos + 1), 2, '0');
                     final String paddedDriverName = Strings.padEnd(driverName, maxDriverNameLength, ' ');
                     final Duration diffFromLeader = l.accumulatedLapTime().minus(data.accumulatedLapTime()).plus(diffToCurrent);

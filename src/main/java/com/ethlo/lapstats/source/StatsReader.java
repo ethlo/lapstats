@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.ethlo.lapstats.model.Driver;
-import com.ethlo.lapstats.model.LapData;
+import com.ethlo.lapstats.model.Timing;
 
 public interface StatsReader
 {
-    Map<Integer, List<LapData>> getDriverLapTimes() throws IOException;
+    Map<Integer, List<Timing>> getDriverLapTimes() throws IOException;
 
     Map<Integer, Driver> getDriverList() throws IOException;
 }
