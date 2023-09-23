@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Race overview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;600&display=swap" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+    <style>
+
+        .section {
+            padding: 25px;
+        }
+
+        html {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+
+            background: url('base.jpg');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat, no-repeat;
+
+        }
+
+        div.content {
+            background: #222222dd;
+            font-size: 1.35em;
+            color: #ddd;
+        }
+
+        h2 {
+            margin-top: 20px
+        }
+
+        th {
+            background: #A31427;
+            color: #ddd;
+        }
+
+        td, th {
+            border-bottom: 1px solid #222;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .implicit {
+            color: #888;
+        }
+
+        .maxtime {
+            background-color: #A31427;
+        }
+
+        .mintime {
+            background-color: #007017;
+        }
+
+        table {
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        thead tr {
+            background: #A31427;
+            color: #ddd;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        tbody tr:nth-child(odd) {
+            background: #151515cc;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #1a1a1acc;
+        }
+
+    </style>
+</head>
+<body>
+<div class="content">
+    <div class="section">
+        <h2>Driver timing</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Driver</th>
+                {% for driver in data.drivers %}
+                <td>{{ driver.name }}</td>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>Best time</th>
+                {% for l in data.minLapTimes %}
+                <td>{{ l.value.toMillis() | date('mm:ss.SSS') }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th>Average time</th>
+                {% for l in data.averageLapTimes %}
+                <td>{{ l.value.toMillis() | date('mm:ss.SSS') }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th>Worst time</th>
+                {% for l in data.maxLapTimes %}
+                <td>{{ l.value.toMillis() | date('mm:ss.SSS') }}</td>
+                {% endfor %}
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Laps</h2>
+        <table class="tableFixHead" style="height:100%">
+            <thead>
+            <tr>
+                <td>Lap</td>
+                {% for driver in data.drivers %}
+                <td>{{ driver.name }}</td>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for entry in data.laps %}
+            <tr>
+                <td>{{ entry.key }}</td>
+                {% for l in entry.value %}
+                <td class="{{ l.implicit ? 'implicit' : '' }}">
+                    {{ l.accumulatedLapTime.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
+                    <div class="{{ l.minLapTime == l.timing.time ? 'mintime' : '' }} {{ l.maxLapTime == l.timing.time ? 'maxtime' : '' }}">
+                        {{ l.timing.time.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
+                    </div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
