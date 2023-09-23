@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,8 @@ public class JsonStatusRenderer implements StatusRenderer
         for (Duration timestamp : raceData.getTicks())
         {
             final LapStatistics data = raceData.getLap(timestamp);
-            final List<LapStatistics> forSameLap = raceData.getLap(data.timing().lap());
-            forSameLap.sort(Comparator.comparing(LapStatistics::accumulatedLapTime));
+            //final List<LapStatistics> forSameLap = raceData.getLap(data.timing().lap());
+            //forSameLap.sort(Comparator.comparing(LapStatistics::accumulatedLapTime));
             //pw.println("\n" + formatDiff(data.accumulatedLapTime()));
             final LapStatistics firstPos = forSameLap.get(0);
             final Duration diffToCurrent = firstPos.accumulatedLapTime().minus(timestamp).abs();
@@ -41,12 +42,13 @@ public class JsonStatusRenderer implements StatusRenderer
                 final LapStatistics l = forSameLap.get(pos);
                 final String driverName = raceData.getDriverData(l.timing().driverId()).name();
                 final Duration diffFromLeader = l.accumulatedLapTime().minus(data.accumulatedLapTime()).plus(diffToCurrent);
-                d.add(Map.of(
-                        "pos", pos + 1,
-                        "driver", driverName,
-                        "diff", diffFromLeader,
-                        "implicit", l.implicit()
-                ));
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("pos", pos + 1);
+                row.put("driver", driverName);
+                row.put("lap", l.timing().lap());
+                row.put("diff", diffFromLeader);
+                row.put("implicit", l.implicit());
+                d.add(row);
             }
             list.add(Map.of("timestamp", timestamp, "data", d));
         }

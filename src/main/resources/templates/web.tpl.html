@@ -7,6 +7,10 @@
     <link href="/css/styles.css" rel="stylesheet">
     <style>
 
+        #race_clock {
+            font-size: 4em;
+        }
+
         .section {
             padding: 25px;
         }
@@ -47,8 +51,10 @@
 
         td, th {
             border-bottom: 1px solid #222;
-            padding: 0.5rem;
+            padding: 0.3rem;
             text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .implicit {
@@ -89,6 +95,29 @@
 </head>
 <body>
 <div class="content">
+
+    <div class="section">
+        <h2>Race status</h2>
+        <div id="race_clock">00:00:00</div>
+        <table id="standing_table">
+            <thead>
+            <tr>
+                <th>Position</th>
+                <th>Driver</th>
+                <th>Lap</th>
+                <th>Diff</th>
+            </tr>
+            </thead>
+            <tbody id="table_standing_body">
+
+            </tbody>
+        </table>
+
+        <button id="start">Start</button>
+        <button id="stop">Stop</button>
+        <button id="reset">Reset</button>
+    </div>
+
     <div class="section">
         <h2>Driver timing</h2>
         <table>
@@ -152,5 +181,113 @@
         </table>
     </div>
 </div>
+<script>
+    let startBtn = document.getElementById('start');
+    let stopBtn = document.getElementById('stop');
+    let resetBtn = document.getElementById('reset');
+    let stopwatch = 0;
+
+    startBtn.addEventListener('click', function () {
+        stopwatch = new Date()
+        render();
+    });
+
+    stopBtn.addEventListener('click', function () {
+    });
+
+    resetBtn.addEventListener('click', function () {
+        document.getElementById('race_watch').innerHTML = "00:00:00.000";
+    });
+
+    let index = 0;
+    let next = null
+    let data;
+    loadJSON('lapstats.json',
+            function (d) {
+                console.log(d);
+                data = d;
+            },
+            function (xhr) {
+                console.error(xhr);
+            }
+    );
+
+    function renderStandings(diff) {
+        if (next == null || next.timestamp < diff) {
+            //console.log(next.timestamp + " - " +  diff)
+            for (i = index; i < data.length; i++) {
+                if (data[i].timestamp >= diff) {
+                    renderStandingTable(next)
+                    next = data[i];
+                    index = i
+                    //console.log(next)
+                    return;
+                }
+            }
+        }
+    }
+
+    function renderStandingTable(data) {
+        console.log(data)
+        if (!data) {
+            return
+        }
+
+        const table = document.getElementById('table_standing_body');
+        table.innerHTML = ''
+        data.data.forEach((row) => {
+            let tr = document.createElement("tr");
+
+            // Get the values of the current object in the JSON data
+            let vals = Object.values(row);
+            let reordered = [vals[0], vals[1], vals[2], vals[3] ];
+
+            // Loop through the values and create table cells
+            reordered.forEach((elem) => {
+                let td = document.createElement("td");
+                td.innerText = elem; // Set the value as the text of the table cell
+                tr.appendChild(td); // Append the table cell to the table row
+            });
+            table.appendChild(tr); // Append the table row to the table
+        });
+        console.log(data);
+    }
+
+    function render() {
+        let diff = new Date() - stopwatch
+        document.getElementById('race_clock').innerHTML = formatTime(diff);
+
+        renderStandings(diff / 100.0);
+
+        setTimeout(render, 50);
+    }
+
+    function formatTime(millis) {
+        const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, millis)),
+                parts = [
+                    d.getUTCHours(),
+                    d.getUTCMinutes(),
+                    d.getUTCSeconds()
+                ]
+        return parts.map(s => String(s).padStart(2, '0')).join(':'); // + '.' + String(d.getUTCMilliseconds()).padStart(3,'0');
+    }
+
+    function loadJSON(path, success, error) {
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    if (success)
+                        success(JSON.parse(xhr.responseText));
+                } else {
+                    if (error)
+                        error(xhr);
+                }
+            }
+        };
+        xhr.open("GET", path, true);
+        xhr.send();
+    }
+</script>
 </body>
 </html>
