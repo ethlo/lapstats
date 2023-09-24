@@ -6,15 +6,12 @@ public class LapStatistics
 {
     private final Timing timing;
     private final Duration accumulatedLapTime;
-
     private final Duration minLapTime;
-
     private final Duration maxLapTime;
-
     private final Duration diffLastLap;
-    private Duration diffLeader;
-
     private final boolean implicit;
+    private Duration diffLeader;
+    private int position;
 
     public LapStatistics(final Timing timing, final Duration accumulatedLapTime, final Duration minLapTime, final Duration maxLapTime, final Duration diffLastLap, final boolean implicit)
     {
@@ -70,6 +67,19 @@ public class LapStatistics
     {
         return timing.time();
     }
+
+    void setDiffLeader(Duration diffToLeader)
+    {
+        this.diffLeader = diffToLeader;
+    }
+
+    public int getPosition()
+    {
+        return position;
+    }
+
+    void setPosition(final int position)
+    {
+        this.position = position;
+    }
 }
-
-

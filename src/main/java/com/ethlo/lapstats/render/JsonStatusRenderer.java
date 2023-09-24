@@ -32,28 +32,24 @@ public class JsonStatusRenderer implements StatusRenderer
         for (Duration timestamp : raceData.getTicks())
         {
             final LapStatistics data = raceData.getLap(timestamp);
-            final List<LapStatistics> forSameLap = raceData.getLap(data.getLap());
-            forSameLap.sort(Comparator.comparing(LapStatistics::getAccumulatedLapTime));
-            final LapStatistics firstPos = forSameLap.get(0);
-            final Duration diffToCurrent = firstPos.getAccumulatedLapTime().minus(timestamp).abs();
-
-            //final LapStatistics l = forSameLap.get(pos);
             status.put(data.getDriverId(), data);
 
             final List<Map<String, Object>> d = new ArrayList<>();
-            status.forEach((driverId, l) ->
+            final List<LapStatistics> r = new ArrayList<>(status.values());
+            r.sort(Comparator.comparing(LapStatistics::getDiffLeader));
+            for (int i = 0; i < r.size(); i++)
             {
-                final String driverName = raceData.getDriverData(driverId).name();
-                //final Duration diffFromLeader = data.accumulatedLapTime().minus(data.accumulatedLapTime()).plus(diffToCurrent);
-
+                final LapStatistics l = r.get(i);
                 final Map<String, Object> row = new LinkedHashMap<>();
-                row.put("pos", driverId);
-                row.put("driver", driverName);
+                row.put("pos", i + 1);
+                row.put("driver", raceData.getDriverData(l.getDriverId()).name());
                 row.put("lap", l.getLap());
-                //row.put("diff", diffFromLeader);
+                row.put("diff", l.getDiffLeader());
                 row.put("implicit", l.isImplicit());
+                row.put("current", l.getAccumulatedLapTime().equals(timestamp));
                 d.add(row);
-            });
+            }
+
             list.add(Map.of("timestamp", timestamp, "data", d));
         }
         mapper.writeValue(out, list);

@@ -40,6 +40,22 @@
             color: #ddd;
         }
 
+        button {
+            border: 1px solid #333;
+            background: #666;
+            font-family: teko;
+            font-size: 1.2em;
+            color: #fff;
+        }
+
+        #speedFactor {
+            border: 1px solid #333;
+            background: #666;
+            font-family: teko;
+            font-size: 1.2em;
+            color: #fff;
+        }
+
         h2 {
             margin-top: 20px
         }
@@ -55,6 +71,10 @@
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
+        }
+
+        .blink {
+            background-color: #A31427AA;
         }
 
         .implicit {
@@ -114,8 +134,15 @@
         </table>
 
         <button id="start">Start</button>
-        <button id="stop">Stop</button>
-        <button id="reset">Reset</button>
+        <!--<button id="stop">Stop</button>
+        <button id="reset">Reset</button>-->
+        <select id="speedFactor">
+            <option value="1">1x</option>
+            <option value="2">2x</option>
+            <option value="5">5x</option>
+            <option value="10">10x</option>
+            <option value="20">20x</option>
+        </select>
     </div>
 
     <div class="section">
@@ -185,42 +212,51 @@
     let startBtn = document.getElementById('start');
     let stopBtn = document.getElementById('stop');
     let resetBtn = document.getElementById('reset');
-    let stopwatch = 0;
-
-    startBtn.addEventListener('click', function () {
-        stopwatch = new Date()
-        render();
-    });
-
-    stopBtn.addEventListener('click', function () {
-    });
-
-    resetBtn.addEventListener('click', function () {
-        document.getElementById('race_watch').innerHTML = "00:00:00.000";
-    });
-
+    let stopwatch;
+    let running = false;
+    let elapsed = 0;
+    let speedFactor;
     let index = 0;
     let next = null
     let data;
-    loadJSON('lapstats.json',
-            function (d) {
-                console.log(d);
-                data = d;
-            },
-            function (xhr) {
-                console.error(xhr);
-            }
-    );
+
+    startBtn.addEventListener('click', function () {
+        speedFactor = parseInt(document.getElementById("speedFactor").value);
+        running = true;
+        stopwatch = new Date(); // + elapsed;
+        console.log('stopwatch: ' + stopwatch)
+
+        console.log("speedFactor" + speedFactor)
+        loadJSON('lapstats.json',
+                function (d) {
+                    console.log(d);
+                    data = d;
+                    render();
+                },
+                function (xhr) {
+                    console.error(xhr);
+                }
+        );
+    });
+
+    stopBtn.addEventListener('click', function () {
+        running = false;
+        elapsed = new Date() - stopwatch;
+    });
+
+    resetBtn.addEventListener('click', function () {
+        stopwatch = null
+        elapsed = new Date(0);
+        document.getElementById('race_watch').innerHTML = "00:00:00.000";
+    });
 
     function renderStandings(diff) {
         if (next == null || next.timestamp < diff) {
-            //console.log(next.timestamp + " - " +  diff)
             for (i = index; i < data.length; i++) {
                 if (data[i].timestamp >= diff) {
                     renderStandingTable(next)
                     next = data[i];
                     index = i
-                    //console.log(next)
                     return;
                 }
             }
@@ -228,7 +264,6 @@
     }
 
     function renderStandingTable(data) {
-        console.log(data)
         if (!data) {
             return
         }
@@ -240,30 +275,34 @@
 
             // Get the values of the current object in the JSON data
             let vals = Object.values(row);
-            let reordered = [vals[0], vals[1], vals[2], vals[3] ];
+            let reordered = [vals[0], vals[1], vals[2], parseFloat(vals[3]).toFixed(3)];
 
             // Loop through the values and create table cells
-            reordered.forEach((elem) => {
+            for (let i = 0; i < reordered.length; i++) {
+                let elem = reordered[i];
                 let td = document.createElement("td");
                 td.innerText = elem; // Set the value as the text of the table cell
+                td.className = vals['5'] === true && i === 1 ? 'blink' : ''
                 tr.appendChild(td); // Append the table cell to the table row
-            });
+            }
             table.appendChild(tr); // Append the table row to the table
         });
         console.log(data);
     }
 
     function render() {
-        let diff = new Date() - stopwatch
-        document.getElementById('race_clock').innerHTML = formatTime(diff);
-
-        renderStandings(diff / 100.0);
-
-        setTimeout(render, 50);
+        if (running) {
+            console.log('stopwatch:' + stopwatch)
+            let diff = new Date() - stopwatch
+            console.log('diff: ' + diff)
+            document.getElementById('race_clock').innerHTML = formatTime(diff);
+            renderStandings(diff / (1000 / speedFactor));
+            setTimeout(render, 50);
+        }
     }
 
     function formatTime(millis) {
-        const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, millis)),
+        const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, millis * speedFactor)),
                 parts = [
                     d.getUTCHours(),
                     d.getUTCMinutes(),

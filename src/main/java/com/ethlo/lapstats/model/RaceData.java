@@ -3,6 +3,7 @@ package com.ethlo.lapstats.model;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ public class RaceData
     private final Map<Integer, Duration> maxLapTimes;
     private final Map<Integer, List<LapStatistics>> lapStatistics;
 
-    private Map<Duration, LapStatistics> ticks;
+    private final Map<Duration, LapStatistics> ticks;
 
     public RaceData(Map<Integer, List<Timing>> lapTimes, Map<Integer, Driver> driverData)
     {
@@ -128,6 +129,16 @@ public class RaceData
                 }
             }
         }
+
+        // Calculate diff to leader
+        ticks.forEach((timestamp, data) ->
+        {
+            final List<LapStatistics> forSameLap = getLap(data.getLap());
+            forSameLap.sort(Comparator.comparing(LapStatistics::getAccumulatedLapTime));
+            final LapStatistics firstPos = forSameLap.get(0);
+            final Duration diffToCurrent = firstPos.getAccumulatedLapTime().minus(timestamp).abs();
+            data.setDiffLeader(diffToCurrent);
+        });
 
         // Calculate average lap time per driver
         driversLastLap.forEach((k, v) -> this.averageLapTimes.put(v.getDriverId(), v.getAccumulatedLapTime().dividedBy(v.getLap())));
