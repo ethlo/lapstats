@@ -41,15 +41,15 @@ public class SrtRenderer implements StatusRenderer
             raceData.getTicks().forEach(time ->
             {
                 final LapStatistics lapData = raceData.getLap(time);
-                final Driver driver = raceData.getDriverData(lapData.timing().driverId());
+                final Driver driver = raceData.getDriverData(lapData.getDriverId());
                 out.println(index.getAndIncrement());
                 out.print(formatSrtTimestamp(time));
                 out.print(" --> ");
                 out.print(formatSrtTimestamp(time.plus(ttl)));
                 out.println();
                 out.print(driver.name());
-                out.print(" | Lap " + lapData.timing().lap());
-                out.print(" | Time " + formatIntervalWithSeconds(lapData.timing().time(), false)); // + " (" + (lapData.diffLastLap() != null ? formatIntervalWithSeconds(lapData.diffLastLap(), true) : " - ") + ")");
+                out.print(" | Lap " + lapData.getLap());
+                out.print(" | Time " + formatIntervalWithSeconds(lapData.getTime(), false)); // + " (" + (lapData.diffLastLap() != null ? formatIntervalWithSeconds(lapData.diffLastLap(), true) : " - ") + ")");
                 out.println();
                 out.println();
             });

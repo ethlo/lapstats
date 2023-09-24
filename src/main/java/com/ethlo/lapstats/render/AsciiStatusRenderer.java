@@ -23,19 +23,19 @@ public class AsciiStatusRenderer implements StatusRenderer
             for (Duration timestamp : raceData.getTicks())
             {
                 final LapStatistics data = raceData.getLap(timestamp);
-                final List<LapStatistics> forSameLap = raceData.getLap(data.timing().lap());
-                forSameLap.sort(Comparator.comparing(LapStatistics::accumulatedLapTime));
-                pw.println("\n" + formatDiff(data.accumulatedLapTime()));
+                final List<LapStatistics> forSameLap = raceData.getLap(data.getLap());
+                forSameLap.sort(Comparator.comparing(LapStatistics::getAccumulatedLapTime));
+                pw.println("\n" + formatDiff(data.getAccumulatedLapTime()));
                 final LapStatistics firstPos = forSameLap.get(0);
-                final Duration diffToCurrent = firstPos.accumulatedLapTime().minus(timestamp).abs();
+                final Duration diffToCurrent = firstPos.getAccumulatedLapTime().minus(timestamp).abs();
                 for (int pos = 0; pos < forSameLap.size(); pos++)
                 {
                     final LapStatistics l = forSameLap.get(pos);
-                    final String driverName = raceData.getDriverData(l.timing().driverId()).name();
+                    final String driverName = raceData.getDriverData(l.getDriverId()).name();
                     final String paddedPos = Strings.padStart(Integer.toString(pos + 1), 2, '0');
                     final String paddedDriverName = Strings.padEnd(driverName, maxDriverNameLength, ' ');
-                    final Duration diffFromLeader = l.accumulatedLapTime().minus(data.accumulatedLapTime()).plus(diffToCurrent);
-                    pw.println(paddedPos + " - " + paddedDriverName + " " + formatDiff(diffFromLeader) + (l.implicit() ? " *" : ""));
+                    final Duration diffFromLeader = l.getAccumulatedLapTime().minus(data.getAccumulatedLapTime()).plus(diffToCurrent);
+                    pw.println(paddedPos + " - " + paddedDriverName + " " + formatDiff(diffFromLeader) + (l.isImplicit() ? " *" : ""));
                 }
             }
         }

@@ -101,7 +101,7 @@ public class RaceData
         {
             for (LapStatistics lapData : e.getValue())
             {
-                this.ticks.put(lapData.accumulatedLapTime(), lapData);
+                this.ticks.put(lapData.getAccumulatedLapTime(), lapData);
             }
         }
 
@@ -115,22 +115,22 @@ public class RaceData
             if (row.size() < initialDrivers.size())
             {
                 // We are missing data for the row
-                final List<Integer> driversFoundForLap = row.stream().map(el -> el.timing().driverId()).toList();
+                final List<Integer> driversFoundForLap = row.stream().map(LapStatistics::getDriverId).toList();
 
                 final List<Integer> toCalculate = new ArrayList<>(initialDrivers);
                 toCalculate.removeAll(driversFoundForLap);
                 for (int driverToCalculate : toCalculate)
                 {
                     final LapStatistics lastForDriver = driversLastLap.get(driverToCalculate);
-                    final Duration avgRound = lastForDriver.accumulatedLapTime().dividedBy(lastForDriver.timing().lap());
-                    final Duration accumulated = lastForDriver.accumulatedLapTime().plus(avgRound.multipliedBy(lap - lastForDriver.timing().lap()));
-                    row.add(new LapStatistics(new Timing(lap, driverToCalculate, avgRound), accumulated, lastForDriver.minLapTime(), lastForDriver.maxLapTime(), Duration.ZERO, true));
+                    final Duration avgRound = lastForDriver.getAccumulatedLapTime().dividedBy(lastForDriver.getLap());
+                    final Duration accumulated = lastForDriver.getAccumulatedLapTime().plus(avgRound.multipliedBy(lap - lastForDriver.getLap()));
+                    row.add(new LapStatistics(new Timing(lap, driverToCalculate, avgRound), accumulated, lastForDriver.getMinLapTime(), lastForDriver.getMaxLapTime(), Duration.ZERO, true));
                 }
             }
         }
 
         // Calculate average lap time per driver
-        driversLastLap.forEach((k, v) -> this.averageLapTimes.put(v.timing().driverId(), v.accumulatedLapTime().dividedBy(v.timing().lap())));
+        driversLastLap.forEach((k, v) -> this.averageLapTimes.put(v.getDriverId(), v.getAccumulatedLapTime().dividedBy(v.getLap())));
     }
 
     private static Duration getDiffToLastLap(Map<Integer, List<Timing>> lapToDriverLapList, int lap, int driverId, Duration lapTime)
@@ -155,7 +155,7 @@ public class RaceData
 
     private Set<Integer> getInitialDrivers()
     {
-        return new TreeSet<>(lapStatistics.values().iterator().next().stream().map(el -> el.timing().driverId()).toList());
+        return new TreeSet<>(lapStatistics.values().iterator().next().stream().map(LapStatistics::getDriverId).toList());
     }
 
     private Map<Integer, LapStatistics> getDriversLastLap()
@@ -165,20 +165,20 @@ public class RaceData
         for (Map.Entry<Integer, List<LapStatistics>> entry : lapStatistics.entrySet())
         {
             final int lap = entry.getKey();
-            final Sets.SetView<Integer> missing = Sets.difference(initialDrivers, entry.getValue().stream().map(el -> el.timing().driverId()).collect(Collectors.toSet()));
+            final Sets.SetView<Integer> missing = Sets.difference(initialDrivers, entry.getValue().stream().map(LapStatistics::getDriverId).collect(Collectors.toSet()));
             for (int m : missing)
             {
                 if (!result.containsKey(m))
                 {
                     // Get previous timing
-                    final LapStatistics lastLapForDriver = getLap(lap - 1).stream().filter(l -> l.timing().driverId() == m).findFirst().orElseThrow(() -> new IllegalArgumentException("Could not find driver " + m + " for timing " + lap));
-                    result.put(lastLapForDriver.timing().driverId(), lastLapForDriver);
+                    final LapStatistics lastLapForDriver = getLap(lap - 1).stream().filter(l -> l.getDriverId() == m).findFirst().orElseThrow(() -> new IllegalArgumentException("Could not find driver " + m + " for timing " + lap));
+                    result.put(lastLapForDriver.getDriverId(), lastLapForDriver);
                 }
             }
         }
         for (LapStatistics lap : new ArrayList<>(lapStatistics.values()).get(lapStatistics.size() - 1))
         {
-            result.putIfAbsent(lap.timing().driverId(), lap);
+            result.putIfAbsent(lap.getDriverId(), lap);
         }
         return result;
     }

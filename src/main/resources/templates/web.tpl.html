@@ -170,8 +170,8 @@
                 {% for l in entry.value %}
                 <td class="{{ l.implicit ? 'implicit' : '' }}">
                     {{ l.accumulatedLapTime.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
-                    <div class="{{ l.minLapTime == l.timing.time ? 'mintime' : '' }} {{ l.maxLapTime == l.timing.time ? 'maxtime' : '' }}">
-                        {{ l.timing.time.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
+                    <div class="{{ l.minLapTime == l.time ? 'mintime' : '' }} {{ l.maxLapTime == l.time ? 'maxtime' : '' }}">
+                        {{ l.time.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
                     </div>
                 </td>
                 {% endfor %}
