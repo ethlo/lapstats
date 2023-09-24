@@ -4,7 +4,6 @@
     <meta charset="utf-8"/>
     <title>Race overview</title>
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;600&display=swap" rel="stylesheet">
-    <link href="/css/styles.css" rel="stylesheet">
     <style>
 
         #race_clock {
@@ -26,12 +25,15 @@
             margin: 0;
             padding: 0;
 
-            background: url('base.jpg');
+            background: url('/base.jpg');
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat, no-repeat;
 
+            font-family: "Teko", Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            color: #fff;
         }
 
         div.content {
@@ -75,6 +77,7 @@
 
         .blink {
             background-color: #A31427AA;
+            transition: 1s ease-in;
         }
 
         .implicit {
@@ -112,10 +115,10 @@
         }
 
     </style>
+
 </head>
 <body>
 <div class="content">
-
     <div class="section">
         <h2>Race status</h2>
         <div id="race_clock">00:00:00</div>
@@ -134,8 +137,8 @@
         </table>
 
         <button id="start">Start</button>
-        <!--<button id="stop">Stop</button>
-        <button id="reset">Reset</button>-->
+        <button id="stop">Stop</button>
+        <button id="reset">Reset</button>
         <select id="speedFactor">
             <option value="1">1x</option>
             <option value="2">2x</option>
@@ -208,51 +211,66 @@
         </table>
     </div>
 </div>
+
+<script>
+    let data = {{json | raw}}
+</script>
+
 <script>
     let startBtn = document.getElementById('start');
     let stopBtn = document.getElementById('stop');
     let resetBtn = document.getElementById('reset');
     let stopwatch;
     let running = false;
-    let elapsed = 0;
+    let stopTime = null;
     let speedFactor;
     let index = 0;
     let next = null
-    let data;
+    //let data;
+
+    /*loadJSON('lapstats.json',
+            function (d) {
+                console.log(d);
+                data = d;
+                console.log("Data loaded")
+            },
+            function (xhr) {
+                console.error(xhr);
+            }
+    );*/
 
     startBtn.addEventListener('click', function () {
         speedFactor = parseInt(document.getElementById("speedFactor").value);
         running = true;
-        stopwatch = new Date(); // + elapsed;
-        console.log('stopwatch: ' + stopwatch)
-
-        console.log("speedFactor" + speedFactor)
-        loadJSON('lapstats.json',
-                function (d) {
-                    console.log(d);
-                    data = d;
-                    render();
-                },
-                function (xhr) {
-                    console.error(xhr);
-                }
-        );
+        let now = new Date();
+        if (stopTime != null) {
+            let diff = now.getTime() + stopTime.getTime();
+            console.log("diff: " + diff)
+            stopwatch = new Date(now.getTime() + diff)
+            console.log('stopwatch: ' + stopwatch)
+        } else {
+            stopwatch = new Date()
+        }
+        render();
     });
 
     stopBtn.addEventListener('click', function () {
         running = false;
-        elapsed = new Date() - stopwatch;
+        stopTime = new Date();
     });
 
     resetBtn.addEventListener('click', function () {
         stopwatch = null
-        elapsed = new Date(0);
-        document.getElementById('race_watch').innerHTML = "00:00:00.000";
+        stopTime = null;
+        index = 0
+        next = null;
+        document.getElementById('race_clock').innerHTML = "00:00:00";
+        document.getElementById('table_standing_body').innerHTML = ''
     });
 
     function renderStandings(diff) {
         if (next == null || next.timestamp < diff) {
-            for (i = index; i < data.length; i++) {
+            for (let i = index; i < data.length; i++) {
                 if (data[i].timestamp >= diff) {
                     renderStandingTable(next)
                     next = data[i];
@@ -287,14 +305,16 @@
             }
             table.appendChild(tr); // Append the table row to the table
         });
-        console.log(data);
+        //console.log(data);
     }
 
     function render() {
         if (running) {
-            console.log('stopwatch:' + stopwatch)
+            console.log(index + " - " + data.length)
+            if (index >= data.length) {
+                running = false;
+            }
             let diff = new Date() - stopwatch
-            console.log('diff: ' + diff)
             document.getElementById('race_clock').innerHTML = formatTime(diff);
             renderStandings(diff / (1000 / speedFactor));
             setTimeout(render, 50);

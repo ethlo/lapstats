@@ -1,0 +1,3 @@
+pebble:
+  suffix: .tpl.html
+  cache: false

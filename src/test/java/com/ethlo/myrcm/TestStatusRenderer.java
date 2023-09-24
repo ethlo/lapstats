@@ -71,15 +71,6 @@ public class TestStatusRenderer
         new PebbleRenderer("web.tpl.html").render(raceData, getFileOutputStream("lapstats_web.html"));
     }
 
-    @Test
-    void testRenderDynamicTable() throws IOException
-    {
-        final Map<Integer, List<Timing>> lapTimes = reader.getDriverLapTimes();
-        final Map<Integer, Driver> driverList = reader.getDriverList();
-        final RaceData raceData = new RaceData(lapTimes, driverList);
-        new PebbleRenderer("web_table.tpl.html").render(raceData, getFileOutputStream("lapstats_web_table.html"));
-    }
-
     private OutputStream getFileOutputStream(String name) throws IOException
     {
         final String tmpDir = System.getProperty("java.io.tmpdir");
