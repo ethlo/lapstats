@@ -1,0 +1,26 @@
+<h2>Laps</h2>
+<table class="tableFixHead" style="height:100%">
+    <thead>
+    <tr>
+        <td>Lap</td>
+        {% for driver in data.drivers %}
+        <td>{{ driver.name }}</td>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for entry in data.laps %}
+    <tr>
+        <td>{{ entry.key }}</td>
+        {% for l in entry.value %}
+        <td class="{{ l.implicit ? 'implicit' : '' }}">
+            {{ l.accumulatedLapTime.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
+            <div class="{{ l.minLapTime == l.time ? 'mintime' : '' }} {{ l.maxLapTime == l.time ? 'maxtime' : '' }}">
+                {{ l.time.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
+            </div>
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>

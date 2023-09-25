@@ -1,0 +1,31 @@
+<h2>Driver timing</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Driver</th>
+        {% for driver in data.drivers %}
+        <td>{{ driver.name }}</td>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Best time</th>
+        {% for l in data.minLapTimes %}
+        <td>{{ l.value.toMillis() | date('mm:ss.SSS') }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Average time</th>
+        {% for l in data.averageLapTimes %}
+        <td>{{ l.value.toMillis() | date('mm:ss.SSS') }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Worst time</th>
+        {% for l in data.maxLapTimes %}
+        <td>{{ l.value.toMillis() | date('mm:ss.SSS') }}</td>
+        {% endfor %}
+    </tr>
+    </tbody>
+</table>

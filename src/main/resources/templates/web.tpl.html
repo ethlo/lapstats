@@ -5,217 +5,24 @@
     <title>Race overview</title>
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;600&display=swap" rel="stylesheet">
     <style>
-
-        #race_clock {
-            font-size: 4em;
-        }
-
-        .section {
-            padding: 25px;
-        }
-
-        html {
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-
-            background: url('/base.jpg');
-            background-attachment: fixed;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat, no-repeat;
-
-            font-family: "Teko", Helvetica, Arial, sans-serif;
-            min-height: 100vh;
-            color: #fff;
-        }
-
-        div.content {
-            background: #222222dd;
-            font-size: 1.35em;
-            color: #ddd;
-        }
-
-        button {
-            border: 1px solid #333;
-            background: #666;
-            font-family: teko;
-            font-size: 1.2em;
-            color: #fff;
-        }
-
-        #speedFactor {
-            border: 1px solid #333;
-            background: #666;
-            font-family: teko;
-            font-size: 1.2em;
-            color: #fff;
-        }
-
-        h2 {
-            margin-top: 20px
-        }
-
-        th {
-            background: #A31427;
-            color: #ddd;
-        }
-
-        td, th {
-            border-bottom: 1px solid #222;
-            padding: 0.3rem;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        .blink {
-            background-color: #A31427AA;
-            transition: 1s ease-in;
-        }
-
-        .implicit {
-            color: #888;
-        }
-
-        .maxtime {
-            background-color: #A31427;
-        }
-
-        .mintime {
-            background-color: #007017;
-        }
-
-        table {
-            width: 100%;
-            table-layout: fixed;
-        }
-
-        thead tr {
-            background: #A31427;
-            color: #ddd;
-        }
-
-        table {
-            border-collapse: collapse;
-        }
-
-        tbody tr:nth-child(odd) {
-            background: #151515cc;
-        }
-
-        tbody tr:nth-child(even) {
-            background: #1a1a1acc;
-        }
-
+        {% include '_style' %}
     </style>
-
 </head>
 <body>
 <div class="content">
     <div class="section">
-        <h2>Race status</h2>
-        <div id="race_clock">00:00:00</div>
-        <table id="standing_table">
-            <thead>
-            <tr>
-                <th>Position</th>
-                <th>Driver</th>
-                <th>Lap</th>
-                <th>Diff</th>
-            </tr>
-            </thead>
-            <tbody id="table_standing_body">
-
-            </tbody>
-        </table>
-
-        <button id="start">Start</button>
-        <button id="stop">Stop</button>
-        <button id="reset">Reset</button>
-        <select id="speedFactor">
-            <option value="1">1x</option>
-            <option value="2">2x</option>
-            <option value="5">5x</option>
-            <option value="10">10x</option>
-            <option value="20">20x</option>
-        </select>
+        {% include '_race_replay' %}
     </div>
-
     <div class="section">
-        <h2>Driver timing</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>Driver</th>
-                {% for driver in data.drivers %}
-                <td>{{ driver.name }}</td>
-                {% endfor %}
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <th>Best time</th>
-                {% for l in data.minLapTimes %}
-                <td>{{ l.value.toMillis() | date('mm:ss.SSS') }}</td>
-                {% endfor %}
-            </tr>
-            <tr>
-                <th>Average time</th>
-                {% for l in data.averageLapTimes %}
-                <td>{{ l.value.toMillis() | date('mm:ss.SSS') }}</td>
-                {% endfor %}
-            </tr>
-            <tr>
-                <th>Worst time</th>
-                {% for l in data.maxLapTimes %}
-                <td>{{ l.value.toMillis() | date('mm:ss.SSS') }}</td>
-                {% endfor %}
-            </tr>
-            </tbody>
-        </table>
+        {% include '_driver_times' %}
     </div>
-
     <div class="section">
-        <h2>Laps</h2>
-        <table class="tableFixHead" style="height:100%">
-            <thead>
-            <tr>
-                <td>Lap</td>
-                {% for driver in data.drivers %}
-                <td>{{ driver.name }}</td>
-                {% endfor %}
-            </tr>
-            </thead>
-            <tbody>
-            {% for entry in data.laps %}
-            <tr>
-                <td>{{ entry.key }}</td>
-                {% for l in entry.value %}
-                <td class="{{ l.implicit ? 'implicit' : '' }}">
-                    {{ l.accumulatedLapTime.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
-                    <div class="{{ l.minLapTime == l.time ? 'mintime' : '' }} {{ l.maxLapTime == l.time ? 'maxtime' : '' }}">
-                        {{ l.time.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
-                    </div>
-                </td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        {% include '_laps' %}
     </div>
 </div>
-
 <script>
-    let data = {{json | raw}}
+    let data = {{ json | raw }}
 </script>
-
 <script>
     let startBtn = document.getElementById('start');
     let stopBtn = document.getElementById('stop');
@@ -226,18 +33,6 @@
     let speedFactor;
     let index = 0;
     let next = null
-    //let data;
-
-    /*loadJSON('lapstats.json',
-            function (d) {
-                console.log(d);
-                data = d;
-                console.log("Data loaded")
-            },
-            function (xhr) {
-                console.error(xhr);
-            }
-    );*/
 
     startBtn.addEventListener('click', function () {
         speedFactor = parseInt(document.getElementById("speedFactor").value);
@@ -290,22 +85,22 @@
         table.innerHTML = ''
         data.data.forEach((row) => {
             let tr = document.createElement("tr");
+            tr.id = 'pos_' + row.pos;
 
-            // Get the values of the current object in the JSON data
-            let vals = Object.values(row);
-            let reordered = [vals[0], vals[1], vals[2], parseFloat(vals[3]).toFixed(3)];
+            let values = Object.values(row);
+            let reordered = [values[0], values[1], values[2], parseFloat(values[3]).toFixed(3)];
+            let current = values['5'] === true;
 
             // Loop through the values and create table cells
             for (let i = 0; i < reordered.length; i++) {
                 let elem = reordered[i];
                 let td = document.createElement("td");
                 td.innerText = elem; // Set the value as the text of the table cell
-                td.className = vals['5'] === true && i === 1 ? 'blink' : ''
-                tr.appendChild(td); // Append the table cell to the table row
+                td.className = current && i === 1 ? 'blink' : ''
+                tr.appendChild(td);
             }
-            table.appendChild(tr); // Append the table row to the table
+            table.appendChild(tr);
         });
-        //console.log(data);
     }
 
     function render() {
@@ -328,24 +123,7 @@
                     d.getUTCMinutes(),
                     d.getUTCSeconds()
                 ]
-        return parts.map(s => String(s).padStart(2, '0')).join(':'); // + '.' + String(d.getUTCMilliseconds()).padStart(3,'0');
-    }
-
-    function loadJSON(path, success, error) {
-        const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    if (success)
-                        success(JSON.parse(xhr.responseText));
-                } else {
-                    if (error)
-                        error(xhr);
-                }
-            }
-        };
-        xhr.open("GET", path, true);
-        xhr.send();
+        return parts.map(s => String(s).padStart(2, '0')).join(':');
     }
 </script>
 </body>

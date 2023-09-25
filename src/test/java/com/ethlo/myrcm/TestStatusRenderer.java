@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class TestStatusRenderer
 
     public TestStatusRenderer() throws IOException
     {
-        reader = new MyRcmReader(getClassPathResourceString("myrcm_sample.html"));
+        reader = new MyRcmReader(IoUtil.getClassPathResourceString("myrcm_sample.html"));
     }
 
     @Test
@@ -77,18 +78,5 @@ public class TestStatusRenderer
         final Path path = Paths.get(tmpDir).resolve(name);
         logger.info("Writing to {}", path);
         return Files.newOutputStream(path);
-    }
-
-    private String getClassPathResourceString(final String path) throws IOException
-    {
-        final URL resource = getClass().getClassLoader().getResource(path);
-        if (resource != null)
-        {
-            try (final InputStream in = resource.openStream())
-            {
-                return new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            }
-        }
-        return null;
     }
 }
