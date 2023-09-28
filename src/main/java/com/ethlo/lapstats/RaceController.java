@@ -50,7 +50,7 @@ public class RaceController
                 }
                 final Map<Integer, List<Timing>> lapTimes = reader.getDriverLapTimes();
                 final Map<Integer, Driver> driverList = reader.getDriverList();
-                return new RaceData(lapTimes, driverList);
+                return new RaceData(lapTimes, reader.getDate(), reader.getName(), driverList);
             }
             catch (IOException exc)
             {

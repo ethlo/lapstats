@@ -1,25 +1,31 @@
-<h2>Race player</h2>
-<div id="race_clock">00:00:00</div>
-<table id="standing_table">
-    <thead>
-    <tr>
-        <th>Position</th>
-        <th>Driver</th>
-        <th>Lap</th>
-        <th>Diff</th>
-    </tr>
-    </thead>
-    <tbody id="table_standing_body">
-    </tbody>
-</table>
+<h2>Race</h2>
+<div>{{data.name}} - {{data.date}}</div>
+<div>
+    <div>
+        <div id="race_clock">00:00:00</div>
+        <button id="start">Start</button>
+        <button id="stop">Stop</button>
+        <button id="reset">Reset</button>
+        <select id="speedFactor">
+            <option value="1">1x</option>
+            <option value="2">2x</option>
+            <option value="5">5x</option>
+            <option value="10">10x</option>
+            <option value="20">20x</option>
+        </select>
+    </div>
 
-<button id="start">Start</button>
-<button id="stop">Stop</button>
-<button id="reset">Reset</button>
-<select id="speedFactor">
-    <option value="1">1x</option>
-    <option value="2">2x</option>
-    <option value="5">5x</option>
-    <option value="10">10x</option>
-    <option value="20">20x</option>
-</select>
+    <table id="standing_table" class="fixed">
+        <thead>
+        <tr>
+            <th>Position</th>
+            <th>Driver</th>
+            <th>Lap</th>
+            <th>Diff</th>
+        </tr>
+        </thead>
+        <tbody id="table_standing_body">
+        </tbody>
+    </table>
+</div>
+

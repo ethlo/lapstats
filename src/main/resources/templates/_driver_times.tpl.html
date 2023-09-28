@@ -1,10 +1,10 @@
 <h2>Driver timing</h2>
-<table>
+<table class="fixed">
     <thead>
     <tr>
         <th>Driver</th>
         {% for driver in data.drivers %}
-        <td>{{ driver.name }}</td>
+        <th class="capitalize">{{ driver.name }}</th>
         {% endfor %}
     </tr>
     </thead>

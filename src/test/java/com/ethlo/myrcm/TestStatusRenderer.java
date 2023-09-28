@@ -1,17 +1,13 @@
 package com.ethlo.myrcm;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,36 +35,28 @@ public class TestStatusRenderer
     @Test
     void testRenderProgressAscii() throws IOException
     {
-        final Map<Integer, List<Timing>> lapTimes = reader.getDriverLapTimes();
-        final Map<Integer, Driver> driverList = reader.getDriverList();
-        final RaceData raceData = new RaceData(lapTimes, driverList);
+        final RaceData raceData = new RaceData(reader);
         new AsciiStatusRenderer().render(raceData, getFileOutputStream("lapstats_ascii.txt"));
     }
 
     @Test
     void testRenderProgressJson() throws IOException
     {
-        final Map<Integer, List<Timing>> lapTimes = reader.getDriverLapTimes();
-        final Map<Integer, Driver> driverList = reader.getDriverList();
-        final RaceData raceData = new RaceData(lapTimes, driverList);
+        final RaceData raceData = new RaceData(reader);
         new JsonStatusRenderer().render(raceData, getFileOutputStream("lapstats.json"));
     }
 
     @Test
     void testRenderCsvPlot() throws IOException
     {
-        final Map<Integer, List<Timing>> lapTimes = reader.getDriverLapTimes();
-        final Map<Integer, Driver> driverList = reader.getDriverList();
-        final RaceData raceData = new RaceData(lapTimes, driverList);
+        final RaceData raceData = new RaceData(reader);
         new CsvPlotStatusRenderer().render(raceData, getFileOutputStream("lapstats_csv_plot.csv"));
     }
 
     @Test
     void testRenderHtml() throws IOException
     {
-        final Map<Integer, List<Timing>> lapTimes = reader.getDriverLapTimes();
-        final Map<Integer, Driver> driverList = reader.getDriverList();
-        final RaceData raceData = new RaceData(lapTimes, driverList);
+        final RaceData raceData = new RaceData(reader);
         new PebbleRenderer("web.tpl.html").render(raceData, getFileOutputStream("lapstats_web.html"));
     }
 

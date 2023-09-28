@@ -3,6 +3,7 @@ package com.ethlo.lapstats.source.myrcm;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
@@ -126,5 +127,32 @@ public class MyRcmReader implements StatsReader
             }
         }
         return result.values();
+    }
+
+    @Override
+    public LocalDateTime getDate()
+    {
+        final Pattern pattern = Pattern.compile("Starttime: (.*)");
+        final String title = doc.getElementById("title").text();
+        final Matcher matcher = pattern.matcher(title);
+        if (matcher.find())
+        {
+            final String strDateTime = matcher.group(1);
+            return LocalDateTime.parse(strDateTime, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+        }
+        return null;
+    }
+
+    @Override
+    public String getName()
+    {
+        final Pattern pattern = Pattern.compile("Section: (.*) - Race time");
+        final String title = doc.getElementById("title").text();
+        final Matcher matcher = pattern.matcher(title);
+        if (matcher.find())
+        {
+            return matcher.group(1);
+        }
+        return null;
     }
 }

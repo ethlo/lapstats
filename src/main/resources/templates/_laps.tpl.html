@@ -1,23 +1,24 @@
 <h2>Laps</h2>
-<table class="tableFixHead" style="height:100%">
+<table class="fixed tableFixHead" style="height:100%">
     <thead>
     <tr>
-        <td>Lap</td>
+        <th>Lap</th>
         {% for driver in data.drivers %}
-        <td>{{ driver.name }}</td>
+        <th class="capitalize">{{ driver.name }}</th>
         {% endfor %}
     </tr>
     </thead>
     <tbody>
     {% for entry in data.laps %}
     <tr>
-        <td>{{ entry.key }}</td>
+        <th>{{ entry.key }}</th>
         {% for l in entry.value %}
-        <td class="{{ l.implicit ? 'implicit' : '' }}">
-            {{ l.accumulatedLapTime.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
-            <div class="{{ l.minLapTime == l.time ? 'mintime' : '' }} {{ l.maxLapTime == l.time ? 'maxtime' : '' }}">
+        <td class="right {{ l.implicit ? 'implicit' : '' }}" style="line-height: 1.5em">
+            <span>{{ l.accumulatedLapTime.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}</span>
+            <br>
+            <span class="{{ l.minLapTime == l.time ? 'mintime' : '' }} {{ l.maxLapTime == l.time ? 'maxtime' : '' }}">
                 {{ l.time.toMillis() | date('mm:ss.SSS') }}{% if l.implicit %}&nbsp;*{% endif %}
-            </div>
+            </span>
         </td>
         {% endfor %}
     </tr>

@@ -80,7 +80,7 @@
         if (!data) {
             return
         }
-
+        console.log('Render table', data);
         const table = document.getElementById('table_standing_body');
         table.innerHTML = ''
         data.data.forEach((row) => {
@@ -94,9 +94,9 @@
             // Loop through the values and create table cells
             for (let i = 0; i < reordered.length; i++) {
                 let elem = reordered[i];
-                let td = document.createElement("td");
+                let td = i === 0 ? document.createElement("th") : document.createElement("td");
                 td.innerText = elem; // Set the value as the text of the table cell
-                td.className = current && i === 1 ? 'blink' : ''
+                td.className = 'right ' + (current && i === 1 ? 'blink capitalize' : 'capitalize')
                 tr.appendChild(td);
             }
             table.appendChild(tr);
@@ -105,7 +105,6 @@
 
     function render() {
         if (running) {
-            console.log(index + " - " + data.length)
             if (index >= data.length) {
                 running = false;
             }

@@ -1,6 +1,7 @@
 package com.ethlo.lapstats.model;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -14,10 +15,15 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import com.ethlo.lapstats.source.StatsReader;
 import com.google.common.collect.Sets;
 
 public class RaceData
 {
+    private final LocalDateTime date;
+
+    private final String name;
+
     private final Map<Integer, Driver> driverData;
 
     private final Map<Integer, Duration> minLapTimes;
@@ -29,8 +35,10 @@ public class RaceData
 
     private final Map<Duration, LapStatistics> ticks;
 
-    public RaceData(Map<Integer, List<Timing>> lapTimes, Map<Integer, Driver> driverData)
+    public RaceData(Map<Integer, List<Timing>> lapTimes, final LocalDateTime date, final String name, Map<Integer, Driver> driverData)
     {
+        this.date = date;
+        this.name = name;
         this.minLapTimes = new LinkedHashMap<>();
         this.averageLapTimes = new LinkedHashMap<>();
         this.maxLapTimes = new LinkedHashMap<>();
@@ -144,6 +152,11 @@ public class RaceData
         driversLastLap.forEach((k, v) -> this.averageLapTimes.put(v.getDriverId(), v.getAccumulatedLapTime().dividedBy(v.getLap())));
     }
 
+    public RaceData(StatsReader reader)
+    {
+        this(reader.getDriverLapTimes(), reader.getDate(), reader.getName(), reader.getDriverList());
+    }
+
     private static Duration getDiffToLastLap(Map<Integer, List<Timing>> lapToDriverLapList, int lap, int driverId, Duration lapTime)
     {
         if (lap <= 2)
@@ -237,5 +250,15 @@ public class RaceData
     public Map<Integer, Duration> getMaxLapTimes()
     {
         return maxLapTimes;
+    }
+
+    public LocalDateTime getDate()
+    {
+        return date;
+    }
+
+    public String getName()
+    {
+        return name;
     }
 }

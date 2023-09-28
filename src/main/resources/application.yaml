@@ -1,3 +1,5 @@
 pebble:
   suffix: .tpl.html
   cache: false
+server:
+  port: 11111

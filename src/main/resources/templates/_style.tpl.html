@@ -23,7 +23,7 @@ background-size: cover;
 background-position: center;
 background-repeat: no-repeat, no-repeat;
 
-font-family: "Teko", Helvetica, Arial, sans-serif;
+font-family: roboto, Helvetica, Arial, sans-serif;
 min-height: 100vh;
 color: #fff;
 }
@@ -51,12 +51,14 @@ color: #fff;
 }
 
 h2 {
-margin-top: 20px
+margin-top: 20px;
+font-family: Teko
 }
 
 th {
 background: #A31427;
 color: #ddd;
+font-family: Teko
 }
 
 td, th {
@@ -78,13 +80,15 @@ color: #888;
 
 .maxtime {
 background-color: #A31427;
+padding:4px;
 }
 
 .mintime {
 background-color: #007017;
+padding:4px;
 }
 
-table {
+.fixed {
 width: 100%;
 table-layout: fixed;
 }
@@ -104,4 +108,12 @@ background: #151515cc;
 
 tbody tr:nth-child(even) {
 background: #1a1a1acc;
+}
+
+.capitalize {
+text-transform: capitalize;
+}
+
+.right {
+text-align: right;
 }
