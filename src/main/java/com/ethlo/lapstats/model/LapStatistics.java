@@ -48,6 +48,11 @@ public class LapStatistics
         return diffLeader;
     }
 
+    void setDiffLeader(Duration diffToLeader)
+    {
+        this.diffLeader = diffToLeader;
+    }
+
     public boolean isImplicit()
     {
         return implicit;
@@ -66,11 +71,6 @@ public class LapStatistics
     public Duration getTime()
     {
         return timing.time();
-    }
-
-    void setDiffLeader(Duration diffToLeader)
-    {
-        this.diffLeader = diffToLeader;
     }
 
     public int getPosition()

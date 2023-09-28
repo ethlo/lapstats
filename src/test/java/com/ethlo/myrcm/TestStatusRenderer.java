@@ -5,16 +5,12 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ethlo.lapstats.model.Driver;
 import com.ethlo.lapstats.model.RaceData;
-import com.ethlo.lapstats.model.Timing;
 import com.ethlo.lapstats.render.AsciiStatusRenderer;
 import com.ethlo.lapstats.render.CsvPlotStatusRenderer;
 import com.ethlo.lapstats.render.JsonStatusRenderer;

@@ -1,14 +1,20 @@
 package com.ethlo.lapstats.render;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.ethlo.lapstats.model.LapStatistics;
 import com.ethlo.lapstats.model.RaceData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.Duration;
-import java.util.*;
 
 public class JsonStatusRenderer implements StatusRenderer
 {
