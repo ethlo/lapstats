@@ -31,7 +31,7 @@ public class AsciiStatusRenderer implements StatusRenderer
                 for (int pos = 0; pos < forSameLap.size(); pos++)
                 {
                     final LapStatistics l = forSameLap.get(pos);
-                    final String driverName = raceData.getDriverData(l.getDriverId()).name();
+                    final String driverName = raceData.getDriverById(l.getDriverId()).orElseThrow().name();
                     final String paddedPos = Strings.padStart(Integer.toString(pos + 1), 2, '0');
                     final String paddedDriverName = Strings.padEnd(driverName, maxDriverNameLength, ' ');
                     final Duration diffFromLeader = l.getAccumulatedLapTime().minus(data.getAccumulatedLapTime()).plus(diffToCurrent);

@@ -1,5 +1,28 @@
+@font-face {
+font-family: 'alarm clock';
+font-style: normal;
+font-weight: normal;
+src: local('alarm clock'), url('/alarm clock.woff') format('woff');
+}
+
+.dc {
+font-family: 'alarm clock';
+}
+
 #race_clock {
-font-size: 4em;
+font-family: 'alarm clock';
+font-size: 75px;
+color: #A31427;
+background: #111;
+padding-top: 10px;
+padding-bottom: 10px;
+width: 414px;
+text-align: center;
+text-shadow: red 0 0 15px;
+}
+
+#standing_table {
+width:410px;
 }
 
 .section {
@@ -17,7 +40,7 @@ width: 100%;
 margin: 0;
 padding: 0;
 
-background: url('/base.jpg');
+/*background: url('/base.jpg');*/
 background-attachment: fixed;
 background-size: cover;
 background-position: center;
@@ -62,16 +85,17 @@ font-family: Teko
 }
 
 td, th {
-border-bottom: 1px solid #222;
+border: 1px solid #333;
 padding: 0.3rem;
+padding-left: 0.6rem;
+padding-right: 0.6rem;
 text-align: center;
 white-space: nowrap;
 overflow: hidden;
 }
 
 .blink {
-background-color: #A31427AA;
-transition: 1s ease-in;
+color: #FBE900;
 }
 
 .implicit {

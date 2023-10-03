@@ -24,7 +24,7 @@ public class RaceData
 
     private final String name;
 
-    private final Map<Integer, Driver> driverData;
+    private final List<Driver> driverData;
 
     private final Map<Integer, Duration> minLapTimes;
 
@@ -35,10 +35,12 @@ public class RaceData
 
     private final Map<Duration, LapStatistics> ticks;
 
-    public RaceData(Map<Integer, List<Timing>> lapTimes, final LocalDateTime date, final String name, Map<Integer, Driver> driverData)
+    public RaceData(Map<Integer, List<Timing>> lapTimes, final LocalDateTime date, final String name, List<Driver> driverData)
     {
         this.date = date;
         this.name = name;
+        this.driverData = driverData;
+
         this.minLapTimes = new LinkedHashMap<>();
         this.averageLapTimes = new LinkedHashMap<>();
         this.maxLapTimes = new LinkedHashMap<>();
@@ -114,7 +116,6 @@ public class RaceData
             }
         }
 
-        this.driverData = driverData;
         final Set<Integer> initialDrivers = getInitialDrivers();
         final Map<Integer, LapStatistics> driversLastLap = getDriversLastLap();
         for (Map.Entry<Integer, List<LapStatistics>> entry : lapStatistics.entrySet())
@@ -128,7 +129,7 @@ public class RaceData
 
                 final List<Integer> toCalculate = new ArrayList<>(initialDrivers);
                 toCalculate.removeAll(driversFoundForLap);
-                for (int driverToCalculate : toCalculate)
+                for (final int driverToCalculate : toCalculate)
                 {
                     final LapStatistics lastForDriver = driversLastLap.get(driverToCalculate);
                     final Duration avgRound = lastForDriver.getAccumulatedLapTime().dividedBy(lastForDriver.getLap());
@@ -179,7 +180,7 @@ public class RaceData
 
     private Set<Integer> getInitialDrivers()
     {
-        return new TreeSet<>(lapStatistics.values().iterator().next().stream().map(LapStatistics::getDriverId).toList());
+        return driverData.stream().map(Driver::id).collect(Collectors.toCollection(TreeSet::new));
     }
 
     private Map<Integer, LapStatistics> getDriversLastLap()
@@ -217,9 +218,9 @@ public class RaceData
         return lapStatistics.get(lap);
     }
 
-    public Driver getDriverData(int driverId)
+    public Optional<Driver> getDriverById(int driverId)
     {
-        return driverData.get(driverId);
+        return driverData.stream().filter(d -> d.id() == driverId).findFirst();
     }
 
     public Collection<Duration> getTicks()
@@ -227,9 +228,9 @@ public class RaceData
         return ticks.keySet();
     }
 
-    public Collection<Driver> getDrivers()
+    public List<Driver> getDrivers()
     {
-        return driverData.values();
+        return driverData;
     }
 
     public Map<Integer, List<LapStatistics>> getLaps()

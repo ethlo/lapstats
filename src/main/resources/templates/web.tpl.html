@@ -59,15 +59,14 @@
         stopTime = null;
         index = 0
         next = null;
-        document.getElementById('race_clock').innerHTML = "00:00:00";
-        document.getElementById('table_standing_body').innerHTML = ''
+        renderStandings(0)
     });
 
     function renderStandings(diff) {
         if (next == null || next.timestamp < diff) {
             for (let i = index; i < data.length; i++) {
                 if (data[i].timestamp >= diff) {
-                    renderStandingTable(next)
+                    renderStandingTable(next || data[i])
                     next = data[i];
                     index = i
                     return;
@@ -94,9 +93,9 @@
             // Loop through the values and create table cells
             for (let i = 0; i < reordered.length; i++) {
                 let elem = reordered[i];
-                let td = i === 0 ? document.createElement("th") : document.createElement("td");
-                td.innerText = elem; // Set the value as the text of the table cell
-                td.className = 'right ' + (current && i === 1 ? 'blink capitalize' : 'capitalize')
+                let td = i === 0 ? document.createElement("td") : document.createElement("td");
+                td.innerText = i === 3 ? formatDiff(elem) : elem; // Set the value as the text of the table cell
+                td.className = 'right' + (current && i === 1 ? ' capitalize' : '') + (current && i === 2 ? ' blink' : '') + (i === 2 || i === 3  ? ' ' : '')
                 tr.appendChild(td);
             }
             table.appendChild(tr);
@@ -124,6 +123,15 @@
                 ]
         return parts.map(s => String(s).padStart(2, '0')).join(':');
     }
+
+    function formatDiff(millis) {
+        const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, millis));
+        return String((d.getUTCHours() * 60) + d.getUTCMinutes()).padStart(2, '0')
+                + ':' + String(d.getUTCSeconds()).padStart(2, '0')
+                + '.' + String(d.getUTCMilliseconds()).padStart(3, '0');
+    }
+
+    renderStandings(0);
 </script>
 </body>
 </html>

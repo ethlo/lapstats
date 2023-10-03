@@ -11,7 +11,7 @@ public interface StatsReader
 {
     Map<Integer, List<Timing>> getDriverLapTimes();
 
-    Map<Integer, Driver> getDriverList();
+    List<Driver> getDriverList();
 
     LocalDateTime getDate();
 

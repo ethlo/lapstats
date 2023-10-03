@@ -41,7 +41,7 @@ public class SrtRenderer implements StatusRenderer
             raceData.getTicks().forEach(time ->
             {
                 final LapStatistics lapData = raceData.getLap(time);
-                final Driver driver = raceData.getDriverData(lapData.getDriverId());
+                final Driver driver = raceData.getDriverById(lapData.getDriverId()).orElseThrow();
                 out.println(index.getAndIncrement());
                 out.print(formatSrtTimestamp(time));
                 out.print(" --> ");

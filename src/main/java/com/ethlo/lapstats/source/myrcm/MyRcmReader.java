@@ -8,10 +8,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -59,43 +60,56 @@ public class MyRcmReader implements StatsReader
     }
 
     @Override
-    public Map<Integer, Driver> getDriverList()
+    public List<Driver> getDriverList()
     {
         final Elements tables = doc.select("table");
         return driverData(tables.get(0));
     }
 
-    private Map<Integer, Driver> driverData(Element driverTable)
+    private List<Driver> driverData(Element driverTable)
     {
         final Map<Integer, Driver> result = new TreeMap<>();
-        final Collection<List<String>> rows = extractRows(List.of(driverTable), 0);
-        for (List<String> row : rows)
+        final List<List<String>> rows = extractRows(List.of(driverTable), 0);
+        for (int rowIndex = 1; rowIndex < rows.size(); rowIndex++)
         {
-            final int driverId = Integer.parseInt(row.get(0));
+            final List<String> row = rows.get(rowIndex);
+            final int driverId = Integer.parseInt(row.get(1));
             result.put(driverId, new Driver(driverId, row.get(3)));
         }
-        return result;
+        return Collections.unmodifiableList(new ArrayList<>(result.values()));
     }
 
     private Map<Integer, List<Timing>> extractLapTimes(List<Element> tables)
     {
-        final Collection<List<String>> rows = extractRows(tables, 1);
+        final List<List<String>> rows = extractRows(tables, 1);
         final Map<Integer, List<Timing>> lapToDriverLapList = new HashMap<>();
-
-        for (List<String> row : rows)
+        final List<Integer> driverIds = rows.get(0).stream().skip(1).map(s ->
         {
+            final Pattern p = Pattern.compile("# (\\d+)");
+            final Matcher matcher = p.matcher(s);
+            if (matcher.find())
+            {
+                return Integer.parseInt(matcher.group(1));
+            }
+            return null;
+        }).filter(Objects::nonNull).toList();
+
+        for (int rowIndex = 1; rowIndex < rows.size(); rowIndex++)
+        {
+            final List<String> row = rows.get(rowIndex);
             final int lap = Integer.parseInt(row.get(0));
 
             final List<Timing> driverList = new ArrayList<>(row.size());
-            for (int driverIndex = 1; driverIndex < row.size(); driverIndex++)
+            for (int driverIndex = 0; driverIndex < driverIds.size(); driverIndex++)
             {
-                final String placementAndTime = row.get(driverIndex);
+                final int driverId = driverIds.get(driverIndex);
+                final String placementAndTime = row.get(driverIndex + 1);
                 final Matcher matcher = pattern.matcher(placementAndTime);
                 if (matcher.matches())
                 {
                     final MatchResult result = matcher.toMatchResult();
                     final Duration lapTime = getLapDuration(result.group(2));
-                    driverList.add(new Timing(lap, driverIndex, lapTime));
+                    driverList.add(new Timing(lap, driverId, lapTime));
                 }
 
                 lapToDriverLapList.put(lap, driverList);
@@ -104,16 +118,16 @@ public class MyRcmReader implements StatsReader
         return lapToDriverLapList;
     }
 
-    private Collection<List<String>> extractRows(List<Element> tables, int skipColumns)
+    private List<List<String>> extractRows(List<Element> tables, int skipColumns)
     {
         final Map<Integer, List<String>> result = new TreeMap<>();
         for (Element table : tables)
         {
             final Elements rows = table.select("tr");
-            for (int i = 1; i < rows.size(); i++)
+            for (int i = 0; i < rows.size(); i++)
             {
                 final Element row = rows.get(i);
-                final Elements cols = row.select("td");
+                final Elements cols = row.select("td,th");
                 result.compute(i, (k, v) -> {
                     if (v == null)
                     {
@@ -126,7 +140,7 @@ public class MyRcmReader implements StatsReader
                 });
             }
         }
-        return result.values();
+        return new ArrayList<>(result.values());
     }
 
     @Override

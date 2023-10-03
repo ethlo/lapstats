@@ -21,6 +21,7 @@ public class LapStatistics
         this.maxLapTime = maxLapTime;
         this.diffLastLap = diffLastLap;
         this.implicit = implicit;
+        this.diffLeader = Duration.ZERO;
     }
 
     public Duration getAccumulatedLapTime()
