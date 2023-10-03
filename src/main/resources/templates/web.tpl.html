@@ -28,49 +28,38 @@
     let stopBtn = document.getElementById('stop');
     let resetBtn = document.getElementById('reset');
     let stopwatch;
+    let diff = 0
     let running = false;
-    let stopTime = null;
     let speedFactor;
     let index = 0;
-    let next = null
 
     startBtn.addEventListener('click', function () {
         speedFactor = parseInt(document.getElementById("speedFactor").value);
         running = true;
-        let now = new Date();
-        if (stopTime != null) {
-            let diff = now.getTime() + stopTime.getTime();
-            console.log("diff: " + diff)
-            stopwatch = new Date(now.getTime() + diff)
-            console.log('stopwatch: ' + stopwatch)
-        } else {
-            stopwatch = new Date()
-        }
+        stopwatch = new Date(new Date().getTime() - diff)
         render();
     });
 
     stopBtn.addEventListener('click', function () {
         running = false;
-        stopTime = new Date();
+        diff = new Date() - stopwatch;
     });
 
     resetBtn.addEventListener('click', function () {
+        running = false;
         stopwatch = null
-        stopTime = null;
         index = 0
-        next = null;
+        diff = 0;
         renderStandings(0)
+        document.getElementById('race_clock').innerHTML = formatTime(diff);
     });
 
     function renderStandings(diff) {
-        if (next == null || next.timestamp < diff) {
-            for (let i = index; i < data.length; i++) {
-                if (data[i].timestamp >= diff) {
-                    renderStandingTable(next || data[i])
-                    next = data[i];
-                    index = i
-                    return;
-                }
+        for (let i = index; i < data.length; i++) {
+            if (data[i].timestamp >= diff) {
+                renderStandingTable(i > 0 ? data[i - 1] : data[0])
+                index = i
+                return;
             }
         }
     }
@@ -110,7 +99,7 @@
             let diff = new Date() - stopwatch
             document.getElementById('race_clock').innerHTML = formatTime(diff);
             renderStandings(diff / (1000 / speedFactor));
-            setTimeout(render, 50);
+            setTimeout(render, 50 / speedFactor);
         }
     }
 
