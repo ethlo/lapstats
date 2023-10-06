@@ -25,7 +25,6 @@
 </script>
 <script>
     let startBtn = document.getElementById('start');
-    let stopBtn = document.getElementById('stop');
     let resetBtn = document.getElementById('reset');
     let stopwatch;
     let diff = 0
@@ -34,15 +33,18 @@
     let index = 0;
 
     startBtn.addEventListener('click', function () {
-        speedFactor = parseInt(document.getElementById("speedFactor").value);
-        running = true;
-        stopwatch = new Date(new Date().getTime() - diff)
-        render();
-    });
-
-    stopBtn.addEventListener('click', function () {
-        running = false;
-        diff = new Date() - stopwatch;
+        if (running) {
+            running = false;
+            diff = new Date() - stopwatch;
+            startBtn.textContent = '\u23F5'
+        }
+        else {
+            speedFactor = parseInt(document.getElementById("speedFactor").value);
+            running = true;
+            stopwatch = new Date(new Date().getTime() - diff)
+            render();
+            startBtn.textContent = '\u23F8'
+        }
     });
 
     resetBtn.addEventListener('click', function () {
@@ -51,14 +53,16 @@
         index = 0
         diff = 0;
         renderStandings(0)
-        document.getElementById('race_clock').innerHTML = formatTime(diff);
+        document.getElementById('race_clock').innerHTML = formatTime(diff, 5);
     });
 
     function renderStandings(diff) {
         for (let i = index; i < data.length; i++) {
             if (data[i].timestamp >= diff) {
-                renderStandingTable(i > 0 ? data[i - 1] : data[0])
-                index = i
+                if (i > index || i === 0) {
+                    renderStandingTable(i > 0 ? data[i - 1] : data[0])
+                    index = i
+                }
                 return;
             }
         }
@@ -68,25 +72,33 @@
         if (!data) {
             return
         }
-        console.log('Render table', data);
+        //console.log('Render table', data);
         const table = document.getElementById('table_standing_body');
         table.innerHTML = ''
         data.data.forEach((row) => {
             let tr = document.createElement("tr");
             tr.id = 'pos_' + row.pos;
 
-            let values = Object.values(row);
-            let reordered = [values[0], values[1], values[2], parseFloat(values[3]).toFixed(3)];
-            let current = values['5'] === true;
+            let pos = document.createElement("td");
+            pos.innerText = row.pos;
+            pos.className = 'right';
+            tr.appendChild(pos)
 
-            // Loop through the values and create table cells
-            for (let i = 0; i < reordered.length; i++) {
-                let elem = reordered[i];
-                let td = i === 0 ? document.createElement("td") : document.createElement("td");
-                td.innerText = i === 3 ? formatDiff(elem) : elem; // Set the value as the text of the table cell
-                td.className = 'right' + (current && i === 1 ? ' capitalize' : '') + (current && i === 2 ? ' blink' : '') + (i === 2 || i === 3  ? ' ' : '')
-                tr.appendChild(td);
-            }
+            let driver = document.createElement("td");
+            driver.innerText = shortName(row.driver);
+            driver.className = 'left capitalize';
+            tr.appendChild(driver)
+
+            let lap = document.createElement("td");
+            lap.innerText = String(row.lap).padStart(2, '0');
+            lap.className = 'right' + (row.current && row.lap > 0 ? ' blink' : '');
+            tr.appendChild(lap)
+
+            let diff = document.createElement("td");
+            diff.innerText = formatDiff(row.diff);
+            diff.className = 'right';
+            tr.appendChild(diff)
+
             table.appendChild(tr);
         });
     }
@@ -97,27 +109,34 @@
                 running = false;
             }
             let diff = new Date() - stopwatch
-            document.getElementById('race_clock').innerHTML = formatTime(diff);
+            document.getElementById('race_clock').innerHTML = formatTime(diff, 5);
             renderStandings(diff / (1000 / speedFactor));
-            setTimeout(render, 50 / speedFactor);
+            setTimeout(render, Math.max(50.0 / speedFactor, 10));
         }
     }
 
-    function formatTime(millis) {
+    function shortName(name){
+        let names = name.split(/\s+/);
+        names[0] = names[0].substring(0, 1) + ".";
+        return names.join(' ');
+    }
+
+    function formatTime(millis, chars) {
         const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, millis * speedFactor)),
                 parts = [
                     d.getUTCHours(),
                     d.getUTCMinutes(),
                     d.getUTCSeconds()
                 ]
-        return parts.map(s => String(s).padStart(2, '0')).join(':');
+        let formatted = parts.map(s => String(s).padStart(2, '0')).join(':');
+        return formatted.substring(formatted.length - chars);
     }
 
     function formatDiff(millis) {
         const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, millis));
         return String((d.getUTCHours() * 60) + d.getUTCMinutes()).padStart(2, '0')
                 + ':' + String(d.getUTCSeconds()).padStart(2, '0')
-                + '.' + String(d.getUTCMilliseconds()).padStart(3, '0');
+                + '.' + String(Math.floor(d.getUTCMilliseconds() / 10.0)).padStart(2, '0');
     }
 
     renderStandings(0);

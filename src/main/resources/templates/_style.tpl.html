@@ -9,20 +9,27 @@ src: local('alarm clock'), url('/alarm clock.woff') format('woff');
 font-family: 'alarm clock';
 }
 
+#race_player {
+    border: 1px solid #000;
+    width: 350px;
+    background: #111;
+}
+
 #race_clock {
 font-family: 'alarm clock';
-font-size: 75px;
+font-size: 55px;
 color: #A31427;
 background: #111;
-padding-top: 10px;
-padding-bottom: 10px;
-width: 414px;
+padding-top: 6px;
+padding-bottom: 6px;
+width: 100%;
 text-align: center;
-text-shadow: red 0 0 15px;
+text-shadow: #ff0000aa 0 0 10px;
+border-bottom: 1px solid #000;
 }
 
 #standing_table {
-width:410px;
+width:100%;
 }
 
 .section {
@@ -60,9 +67,14 @@ color: #ddd;
 button {
 border: 1px solid #333;
 background: #666;
-font-family: teko;
 font-size: 1.2em;
 color: #fff;
+width: 50px;
+height: 50px;
+}
+
+select {
+    height: 50px;
 }
 
 #speedFactor {
@@ -79,16 +91,20 @@ font-family: Teko
 }
 
 th {
-background: #A31427;
+background: #111;
 color: #ddd;
 font-family: Teko
+border: 1px solid #111;
+}
+
+td {
+    border: 1px solid #333;
 }
 
 td, th {
-border: 1px solid #333;
 padding: 0.3rem;
-padding-left: 0.6rem;
-padding-right: 0.6rem;
+padding-left: 0.4rem;
+padding-right: 0.4rem;
 text-align: center;
 white-space: nowrap;
 overflow: hidden;
@@ -127,17 +143,46 @@ border-collapse: collapse;
 }
 
 tbody tr:nth-child(odd) {
-background: #151515cc;
+background: #151515;
 }
 
 tbody tr:nth-child(even) {
-background: #1a1a1acc;
+background: #1a1a1a;
 }
 
 .capitalize {
 text-transform: capitalize;
 }
 
+.left {
+text-align: left;
+}
+
 .right {
 text-align: right;
+}
+
+.border-none {
+border-collapse: collapse;
+border: none;
+}
+
+.border-none td {
+border: 1px solid black;
+}
+
+.border-none tr:first-child td {
+border-top: none;
+}
+
+.border-none tr:last-child td {
+border-bottom: none;
+}
+
+.border-none tr td:first-child {
+border-left: none;
+}
+
+.border-none tr td:last-child {
+border-right: none;
 }
