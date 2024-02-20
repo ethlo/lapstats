@@ -57,11 +57,10 @@ public class JsonStatusRenderer implements StatusRenderer
         final List<LapStatistics> currentRowSortedByPos = new ArrayList<>(currentRow.values());
         currentRowSortedByPos.sort((a, b) -> ComparisonChain.start().compare(b.getLap(), a.getLap()).compare(a.getDiffLeader(), b.getDiffLeader()).result());
 
-        int lastRowLap = 0;
         int pos = 1;
         for (LapStatistics l : currentRowSortedByPos)
         {
-            final Long diff = lastRowLap < l.getLap() + 3 ? l.getDiffLeader().toMillis() : null;
+            final Long diff = l.getDiffLeader().isZero() && l.getPosition() != 1 ? (timestamp.toMillis() - l.getAccumulatedLapTime().toMillis()) : l.getDiffLeader().toMillis();
             final Map<String, Object> row = new LinkedHashMap<>();
             row.put("pos", pos);
             row.put("driver", raceData.getDriverById(l.getDriverId()).orElseThrow().name());
@@ -70,8 +69,6 @@ public class JsonStatusRenderer implements StatusRenderer
             row.put("implicit", l.isImplicit());
             row.put("current", l.getAccumulatedLapTime().equals(timestamp));
             d.add(row);
-
-            lastRowLap = l.getLap();
             pos++;
         }
         list.add(Map.of("timestamp", timestamp, "data", d));

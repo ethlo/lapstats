@@ -132,9 +132,12 @@ public class RaceData
                 for (final int driverToCalculate : toCalculate)
                 {
                     final LapStatistics lastForDriver = driversLastLap.get(driverToCalculate);
-                    final Duration avgRound = lastForDriver.getAccumulatedLapTime().dividedBy(lastForDriver.getLap());
-                    final Duration accumulated = lastForDriver.getAccumulatedLapTime().plus(avgRound.multipliedBy(lap - lastForDriver.getLap()));
-                    row.add(new LapStatistics(new Timing(lap, driverToCalculate, avgRound), accumulated, lastForDriver.getMinLapTime(), lastForDriver.getMaxLapTime(), Duration.ZERO, true));
+                    if (lastForDriver != null)
+                    {
+                        final Duration avgRound = lastForDriver.getAccumulatedLapTime().dividedBy(lastForDriver.getLap());
+                        final Duration accumulated = lastForDriver.getAccumulatedLapTime().plus(avgRound.multipliedBy(lap - lastForDriver.getLap()));
+                        row.add(new LapStatistics(new Timing(lap, driverToCalculate, avgRound), accumulated, lastForDriver.getMinLapTime(), lastForDriver.getMaxLapTime(), Duration.ZERO, true));
+                    }
                 }
             }
         }
@@ -142,7 +145,7 @@ public class RaceData
         // Calculate diff to leader
         ticks.forEach((timestamp, data) ->
         {
-            final List<LapStatistics> forSameLap = getLap(data.getLap()).stream().filter(ls->!ls.isImplicit()).sorted(Comparator.comparing(LapStatistics::getAccumulatedLapTime)).toList();
+            final List<LapStatistics> forSameLap = getLap(data.getLap()).stream().filter(ls -> !ls.isImplicit()).sorted(Comparator.comparing(LapStatistics::getAccumulatedLapTime)).toList();
             final LapStatistics firstPos = forSameLap.get(0);
             final Duration diffToCurrent = firstPos.getAccumulatedLapTime().minus(timestamp).abs();
             data.setDiffLeader(diffToCurrent);
@@ -194,10 +197,12 @@ public class RaceData
             {
                 if (!result.containsKey(m))
                 {
-                    // Get previous timing
+                    // Get previous timing if available
                     final List<LapStatistics> prevLap = getLap(lap - 1);
-                    final LapStatistics lastLapForDriver = prevLap.stream().filter(l -> l.getDriverId() == m).findFirst().orElseThrow(() -> new IllegalArgumentException("Could not find driver " + m + " for timing " + lap));
-                    result.put(lastLapForDriver.getDriverId(), lastLapForDriver);
+                    if (prevLap != null)
+                    {
+                        prevLap.stream().filter(l -> l.getDriverId() == m).findFirst().ifPresent(e -> result.put(e.getDriverId(), e));
+                    }
                 }
             }
         }
