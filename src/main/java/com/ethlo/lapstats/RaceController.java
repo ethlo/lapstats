@@ -33,7 +33,7 @@ public class RaceController
     @GetMapping("/results/myrcm/{eventId}/{raceId}/{reportKey}")
     public String myrcm(@PathVariable("eventId") String eventId, @PathVariable("raceId") String raceId, @PathVariable("reportKey") String reportKey, Model model) throws IOException
     {
-        final String url = "https://www.myrcm.ch/myrcm/report/en/" + eventId + "/" + raceId + "?reportKey=" + reportKey;
+        final String url = "https://myrcm.ch/myrcm/report/en/" + eventId + "/" + raceId + "?reportKey=" + reportKey;
         final RaceData raceData = cache.computeIfAbsent(url, u ->
         {
             logger.info(url);

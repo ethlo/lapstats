@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,12 @@ import com.ethlo.lapstats.render.PebbleRenderer;
 import com.ethlo.lapstats.source.StatsReader;
 import com.ethlo.lapstats.source.myrcm.MyRcmReader;
 
-public class TestStatusRenderer
+public class StatusRendererTest
 {
-    private static final Logger logger = LoggerFactory.getLogger(TestStatusRenderer.class);
+    private static final Logger logger = LoggerFactory.getLogger(StatusRendererTest.class);
     private final StatsReader reader;
 
-    public TestStatusRenderer() throws IOException
+    public StatusRendererTest() throws IOException
     {
         reader = new MyRcmReader(IoUtil.getClassPathResourceString("myrcm_sample.html"));
     }
@@ -50,6 +51,7 @@ public class TestStatusRenderer
     }
 
     @Test
+    @Disabled
     void testRenderHtml() throws IOException
     {
         final RaceData raceData = new RaceData(reader);

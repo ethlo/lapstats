@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ethlo.lapstats.model.LapStatistics;
 import com.ethlo.lapstats.model.RaceData;
@@ -58,18 +57,23 @@ public class JsonStatusRenderer implements StatusRenderer
         final List<LapStatistics> currentRowSortedByPos = new ArrayList<>(currentRow.values());
         currentRowSortedByPos.sort((a, b) -> ComparisonChain.start().compare(b.getLap(), a.getLap()).compare(a.getDiffLeader(), b.getDiffLeader()).result());
 
-        final AtomicInteger pos = new AtomicInteger(1);
-        currentRowSortedByPos.forEach(l ->
+        int lastRowLap = 0;
+        int pos = 1;
+        for (LapStatistics l : currentRowSortedByPos)
         {
+            final Long diff = lastRowLap < l.getLap() + 3 ? l.getDiffLeader().toMillis() : null;
             final Map<String, Object> row = new LinkedHashMap<>();
-            row.put("pos", pos.getAndIncrement());
+            row.put("pos", pos);
             row.put("driver", raceData.getDriverById(l.getDriverId()).orElseThrow().name());
             row.put("lap", l.getLap());
-            row.put("diff", l.getDiffLeader().toMillis());
+            row.put("diff", diff);
             row.put("implicit", l.isImplicit());
             row.put("current", l.getAccumulatedLapTime().equals(timestamp));
             d.add(row);
-        });
+
+            lastRowLap = l.getLap();
+            pos++;
+        }
         list.add(Map.of("timestamp", timestamp, "data", d));
     }
 }

@@ -142,8 +142,7 @@ public class RaceData
         // Calculate diff to leader
         ticks.forEach((timestamp, data) ->
         {
-            final List<LapStatistics> forSameLap = getLap(data.getLap());
-            forSameLap.sort(Comparator.comparing(LapStatistics::getAccumulatedLapTime));
+            final List<LapStatistics> forSameLap = getLap(data.getLap()).stream().filter(ls->!ls.isImplicit()).sorted(Comparator.comparing(LapStatistics::getAccumulatedLapTime)).toList();
             final LapStatistics firstPos = forSameLap.get(0);
             final Duration diffToCurrent = firstPos.getAccumulatedLapTime().minus(timestamp).abs();
             data.setDiffLeader(diffToCurrent);
@@ -196,12 +195,14 @@ public class RaceData
                 if (!result.containsKey(m))
                 {
                     // Get previous timing
-                    final LapStatistics lastLapForDriver = getLap(lap - 1).stream().filter(l -> l.getDriverId() == m).findFirst().orElseThrow(() -> new IllegalArgumentException("Could not find driver " + m + " for timing " + lap));
+                    final List<LapStatistics> prevLap = getLap(lap - 1);
+                    final LapStatistics lastLapForDriver = prevLap.stream().filter(l -> l.getDriverId() == m).findFirst().orElseThrow(() -> new IllegalArgumentException("Could not find driver " + m + " for timing " + lap));
                     result.put(lastLapForDriver.getDriverId(), lastLapForDriver);
                 }
             }
         }
-        for (LapStatistics lap : new ArrayList<>(lapStatistics.values()).get(lapStatistics.size() - 1))
+        final List<LapStatistics> laps = lapStatistics.isEmpty() ? List.of() : new ArrayList<>(lapStatistics.values()).get(lapStatistics.size() - 1);
+        for (LapStatistics lap : laps)
         {
             result.putIfAbsent(lap.getDriverId(), lap);
         }

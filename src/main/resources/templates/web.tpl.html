@@ -95,7 +95,7 @@
             tr.appendChild(lap)
 
             let diff = document.createElement("td");
-            diff.innerText = formatDiff(row.diff);
+            diff.innerText = row.diff == null ? 'N/A' : formatDiff(row.diff);
             diff.className = 'right';
             tr.appendChild(diff)
 

@@ -7,13 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,7 +56,7 @@ public class MyRcmReader implements StatsReader
     @Override
     public List<Driver> getDriverList()
     {
-        final Elements tables = doc.select("table");
+        final Elements tables = doc.select("#data-table");
         return driverData(tables.get(0));
     }
 
@@ -74,25 +68,16 @@ public class MyRcmReader implements StatsReader
         {
             final List<String> row = rows.get(rowIndex);
             final int driverId = Integer.parseInt(row.get(1));
-            result.put(driverId, new Driver(driverId, row.get(3)));
+            result.put(driverId, new Driver(driverId, rowIndex, row.get(3)));
         }
-        return Collections.unmodifiableList(new ArrayList<>(result.values()));
+        return List.copyOf(result.values());
     }
 
     private Map<Integer, List<Timing>> extractLapTimes(List<Element> tables)
     {
         final List<List<String>> rows = extractRows(tables, 1);
         final Map<Integer, List<Timing>> lapToDriverLapList = new HashMap<>();
-        final List<Integer> driverIds = rows.get(0).stream().skip(1).map(s ->
-        {
-            final Pattern p = Pattern.compile("# (\\d+)");
-            final Matcher matcher = p.matcher(s);
-            if (matcher.find())
-            {
-                return Integer.parseInt(matcher.group(1));
-            }
-            return null;
-        }).filter(Objects::nonNull).toList();
+        final List<Driver> drivers = getDriverList().stream().sorted(Comparator.comparingInt(Driver::index)).toList();
 
         for (int rowIndex = 1; rowIndex < rows.size(); rowIndex++)
         {
@@ -100,10 +85,11 @@ public class MyRcmReader implements StatsReader
             final int lap = Integer.parseInt(row.get(0));
 
             final List<Timing> driverList = new ArrayList<>(row.size());
-            for (int driverIndex = 0; driverIndex < driverIds.size(); driverIndex++)
+            for (int i = 0; i < drivers.size(); i++)
             {
-                final int driverId = driverIds.get(driverIndex);
-                final String placementAndTime = row.get(driverIndex + 1);
+                final Driver driver = drivers.get(i);
+                final int driverId = driver.id();
+                final String placementAndTime = row.get(i + 1);
                 final Matcher matcher = pattern.matcher(placementAndTime);
                 if (matcher.matches())
                 {
