@@ -60,7 +60,7 @@ public class JsonStatusRenderer implements StatusRenderer
         int pos = 1;
         for (LapStatistics l : currentRowSortedByPos)
         {
-            final Long diff = l.getDiffLeader().isZero() && l.getPosition() != 1 ? (timestamp.toMillis() - l.getAccumulatedLapTime().toMillis()) : l.getDiffLeader().toMillis();
+            final Long diff = l.getDiffLeader().isZero() && pos != 1 ? (timestamp.toMillis() - l.getAccumulatedLapTime().toMillis()) : l.getDiffLeader().toMillis();
             final Map<String, Object> row = new LinkedHashMap<>();
             row.put("pos", pos);
             row.put("driver", raceData.getDriverById(l.getDriverId()).orElseThrow().name());
